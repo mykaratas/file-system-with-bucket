@@ -151,19 +151,6 @@ export class LocaleGet implements Get {
   }
 }
 
-export class FileSystem implements Factory {
-  constructor(private factory: Factory) {}
-  put() {
-    return this.factory.get();
-  }
-  get() {
-    return this.factory.get();
-  }
-  list() {
-    return this.factory.list();
-  }
-}
-
 export interface MinioClientOptions extends MinioClietOptions {}
 
 export interface SftpClientOptions extends ConnectOptions {
@@ -181,8 +168,22 @@ export interface FtpClientOptions extends AccessOptions {
   timeout?: number;
 }
 
+export class FileSystem implements Factory {
+  constructor(private factory: Factory) {}
+  put() {
+    return this.factory.get();
+  }
+  get() {
+    return this.factory.get();
+  }
+  list() {
+    return this.factory.list();
+  }
+}
+
 export class FileSystemConfig {
   private factory: Factory;
+  public client: FileSystem;
   constructor(
     clientOptions: SftpClientOptions | MinioClietOptions | FtpClientOptions,
     clientType: 'minio' | 'aws' | 'sftp' | 'ftp' | 'locale' = 'locale',
@@ -196,6 +197,6 @@ export class FileSystemConfig {
     } else {
       this.factory = new LocaleFactory();
     }
-    new FileSystem(this.factory);
+    this.client = new FileSystem(this.factory);
   }
 }
